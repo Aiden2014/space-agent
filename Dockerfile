@@ -19,11 +19,8 @@ WORKDIR /work/
 COPY ./web/boxdocker ./web/boxdocker
 
 RUN	apk add --no-cache zip
-
 RUN cd web/boxdocker && npm install && npm run build && mv dist boxdocker && \
-        zip -r static_html.zip boxdocker && mv static_html.zip ../../res
-
-
+        zip -r static_html.zip boxdocker && mkdir ../../res && mv static_html.zip ../../res
 
 FROM golang:1.22.3-alpine3.20 as golang-builder
 
@@ -34,7 +31,6 @@ COPY . .
 COPY --from=npm-builder /work/res /work/res
 
 RUN apk add --no-cache make
-
 RUN go env -w GO111MODULE=on && make -f Makefile
 
 FROM debian:12
